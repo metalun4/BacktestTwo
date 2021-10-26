@@ -10,11 +10,11 @@ mpl.rcParams['font.family'] = 'serif'
 class Backtester(object):
 
     def __init__(self, initial_deposit, symbol, start, end, data=None):
-        self.initial_deposit = initial_deposit
-        self.cash = initial_deposit
-        self.symbol = symbol
-        self.start = start
-        self.end = end
+        self.initial_deposit = float(initial_deposit)
+        self.cash = self.initial_deposit
+        self.symbol = str(symbol)
+        self.start = str(start)
+        self.end = str(end)
         if data is None:
             self.data, self.calculated_data = self.get_sample_data()
         else:
@@ -53,4 +53,4 @@ class Backtester(object):
 
         tested['cash'].plot(title="portfolio size")
 
-        print("Portfolio current value: $%.2f" %tested.iloc[-1]['cash'])
+        print("Portfolio current value: $%.2f" % tested.iloc[-1]['cash'])
