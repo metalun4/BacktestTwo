@@ -1,6 +1,6 @@
 import numpy as np
 
-from Utils import d1f, dN, N
+from Helpers.Utils import d1f, dN, N
 
 
 def set_delta(flag, S, K, T, r, sigma):

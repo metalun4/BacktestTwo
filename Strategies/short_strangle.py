@@ -1,21 +1,12 @@
-import numpy as np
 import pandas as pd
 
-from Option import Option
-
-
-class Strategy:
-    """ General strategy class for all. """
-    def __init__(self, history, portfolio, dte):
-        self.history = history
-        self.portfolio = portfolio
-        self.dte = dte
-
-        self.T = dte/365
+from Helpers.Option import Option
+from Strategy import Strategy
 
 
 class ShortStrangle(Strategy):
     """ Short strangle strategy class """
+
     def __init__(self, history, portfolio, dte):
         super().__init__(history, portfolio, dte)
         self.active_pos = None
@@ -41,8 +32,8 @@ class ShortStrangle(Strategy):
 
         if self._open is False:
             # Calculate top and bottom strike prices based on returns
-            top_K = int(S * (1+row['return_mean']+0.7*row['return_sd']))
-            bot_K = int(S * (1+row['return_mean']-2*row['return_sd']))
+            top_K = int(S * (1 + row['return_mean'] + 0.7 * row['return_sd']))
+            bot_K = int(S * (1 + row['return_mean'] - 2 * row['return_sd']))
 
             # Calculate position opening cost
             call_premium = Option('c', S, top_K, self.T, r, sigma).price
@@ -50,7 +41,7 @@ class ShortStrangle(Strategy):
             contract_cost = call_premium + put_premium
 
             # Calculate multiplier (10% of portfolio)
-            m = int((0.05*self.portfolio[-1:][0]['cash'])/contract_cost)
+            m = int((0.05 * self.portfolio[-1:][0]['cash']) / contract_cost)
             if m > 1:
                 amount = m
             else:
@@ -60,7 +51,7 @@ class ShortStrangle(Strategy):
             self.active_pos = {'call': top_K, 'put': bot_K, 'cost': contract_cost, 'amount': amount}
         elif self._open <= self.dte:
             # Get current day to expiry
-            T = (self.dte - self._open)/365
+            T = (self.dte - self._open) / 365
 
             # Calculate position closing cost
             call_premium = Option('c', S, self.active_pos['call'], T, r, sigma).price
@@ -68,13 +59,13 @@ class ShortStrangle(Strategy):
             curr_cost = (call_premium + put_premium) * self.active_pos['amount']
 
             # Opening cost
-            cost = self.active_pos['cost']*self.active_pos['amount']
+            cost = self.active_pos['cost'] * self.active_pos['amount']
 
             # always buyback at 75% of opening cost
-            if curr_cost <= (75/100)*cost:
+            if curr_cost <= (75 / 100) * cost:
                 self.close_position(current_date, curr_cost)
                 self.active_pos = None
-            elif curr_cost >= (650/100)*cost: # Stop loss for huge losses
+            elif curr_cost >= (650 / 100) * cost:  # Stop loss for huge losses
                 self.close_position(current_date, curr_cost)
                 self.active_pos = None
             else:
@@ -100,4 +91,3 @@ class ShortStrangle(Strategy):
         calculated_portfolio.set_index('date', inplace=True)
 
         return calculated_portfolio
-

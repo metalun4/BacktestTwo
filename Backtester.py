@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from Strategy import ShortStrangle
+from Strategies.Strategy import ShortStrangle
 
 mpl.rcParams['font.family'] = 'serif'
 
