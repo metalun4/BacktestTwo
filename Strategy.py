@@ -70,8 +70,11 @@ class ShortStrangle(Strategy):
             # Opening cost
             cost = self.active_pos['cost']*self.active_pos['amount']
 
-            # always buyback at 50% of opening cost
-            if curr_cost <= (50/100)*cost:
+            # always buyback at 75% of opening cost
+            if curr_cost <= (75/100)*cost:
+                self.close_position(current_date, curr_cost)
+                self.active_pos = None
+            elif curr_cost >= (650/100)*cost: # Stop loss for huge losses
                 self.close_position(current_date, curr_cost)
                 self.active_pos = None
             else:
