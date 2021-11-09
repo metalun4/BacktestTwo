@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from Strategies.Strategy import ShortStrangle
+from Strategies.short_strangle import ShortStrangle
+from Strategies.call_debit import CallDebit
 
 mpl.rcParams['font.family'] = 'serif'
 
@@ -11,7 +12,6 @@ class Backtester(object):
 
     def __init__(self, initial_deposit, symbol, start, end, data=None):
         self.initial_deposit = float(initial_deposit)
-        self.cash = self.initial_deposit
         self.symbol = str(symbol)
         self.start = str(start)
         self.end = str(end)
@@ -45,12 +45,10 @@ class Backtester(object):
         return raw_history, history
 
     def main(self):
-        portfolio = [{'date': self.calculated_data.index[0], 'cash': self.initial_deposit}]
+        calld = CallDebit(self.calculated_data, self.initial_deposit, 30)
 
-        strat = ShortStrangle(self.calculated_data, portfolio, 30)
+        tested_call_debit = calld.run_strategy()
 
-        tested = strat.run_strategy()
+        tested_call_debit['cash'].plot(title="Call Debit")
 
-        tested['cash'].plot(title="portfolio size")
-
-        print("Portfolio current value: $%.2f" % tested.iloc[-1]['cash'])
+        print("Portfolio current value: $%.2f" % tested_call_debit.iloc[-1]['cash'])
