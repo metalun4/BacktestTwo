@@ -1,17 +1,11 @@
 import pandas as pd
 
 from Helpers.Option import Option
-from Strategy import Strategy
+from Strategies.Strategy import Strategy
 
 
 class ShortStrangle(Strategy):
     """ Short strangle strategy class """
-
-    def __init__(self, history, portfolio, dte):
-        super().__init__(history, portfolio, dte)
-        self.active_pos = None
-        self._open = False
-
     def open_position(self, curr_date, cost):
         self.portfolio += [{'date': curr_date, 'cash': self.portfolio[-1:][0]['cash'] + cost}]
         self._open += 1
@@ -32,7 +26,7 @@ class ShortStrangle(Strategy):
 
         if self._open is False:
             # Calculate top and bottom strike prices based on returns
-            top_K = int(S * (1 + row['return_mean'] + 0.7 * row['return_sd']))
+            top_K = int(S * (1 + row['return_mean'] + 0.8 * row['return_sd']))
             bot_K = int(S * (1 + row['return_mean'] - 2 * row['return_sd']))
 
             # Calculate position opening cost
